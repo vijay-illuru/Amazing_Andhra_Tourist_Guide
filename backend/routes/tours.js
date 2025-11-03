@@ -13,7 +13,7 @@ import {
 
 const router = express.Router();
 
-// Public routes
+// Public routes - Specific routes MUST come before parameterized routes
 router.get("/search/getTourBySearch", getTourBySearch);
 router.get("/search/getFeaturedTours", getFeaturedTour);
 router.get("/search/getTourCount", getTourCount);

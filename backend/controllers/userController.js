@@ -31,7 +31,11 @@ export const updateUser = async (req, res) => {
         $set: req.body,
       },
       { new: true }
-    );
+    ).select("-password -adminSecretKey");
+
+    if (!updateUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
 
     res.status(200).json({
       success: true,
@@ -39,9 +43,11 @@ export const updateUser = async (req, res) => {
       data: updateUser,
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to update. Try again" });
+    console.error("Error updating user:", err);
+    res.status(500).json({ 
+      success: false, 
+      message: err.message || "Failed to update. Try again" 
+    });
   }
 };
 
@@ -49,14 +55,21 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   const id = req.params.id;
   try {
-    await User.findByIdAndDelete(id);
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (!deletedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
 
     res.status(200).json({
       success: true,
       message: "Successfully deleted",
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Failed to delete" });
+    console.error("Error deleting user:", err);
+    res.status(500).json({ 
+      success: false, 
+      message: err.message || "Failed to delete" 
+    });
   }
 };
 
@@ -64,7 +77,10 @@ export const deleteUser = async (req, res) => {
 export const getSingleUser = async (req, res) => {
   const id = req.params.id;
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id).select("-password -adminSecretKey");
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
 
     res.status(200).json({
       success: true,
@@ -72,14 +88,15 @@ export const getSingleUser = async (req, res) => {
       data: user,
     });
   } catch (err) {
-    res.status(404).json({ success: false, message: "Not found" });
+    console.error("Error fetching user:", err);
+    res.status(500).json({ success: false, message: err.message || "Failed to fetch user" });
   }
 };
 
 //getAll User
 export const getAllUser = async (req, res) => {
   try {
-    const users = await Tour.find({});
+    const users = await User.find({}).select("-password -adminSecretKey");
 
     res.status(200).json({
       success: true,
@@ -95,25 +112,46 @@ export const getAllUser = async (req, res) => {
 export const getUserProfile = async (req, res) => {
   try {
     const userId = req.user.id;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "User ID not found" });
+    }
+    
     const user = await User.findById(userId).select("-password -adminSecretKey");
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
-    // Get bookings for this user
-    const bookings = await Booking.find({ userId });
+    
+    // Get bookings for this user - userId can be String or ObjectId, find both
+    const bookings = await Booking.find({ 
+      $or: [
+        { userId: userId },
+        { userId: userId.toString() }
+      ]
+    });
+    
     // Get tour details for each booking
     const tours = await Promise.all(
       bookings.map(async (booking) => {
-        const tour = await Tour.findOne({ title: booking.tourName });
-        return tour ? { ...booking._doc, tour } : booking;
+        try {
+          const tour = await Tour.findOne({ title: booking.tourName });
+          return tour ? { ...booking._doc, tour } : booking;
+        } catch (tourErr) {
+          console.error("Error fetching tour for booking:", tourErr);
+          return booking; // Return booking without tour if tour fetch fails
+        }
       })
     );
+    
     res.status(200).json({
       success: true,
       user,
       bookings: tours,
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Failed to fetch profile" });
+    console.error("Error in getUserProfile:", err);
+    res.status(500).json({ 
+      success: false, 
+      message: err.message || "Failed to fetch profile" 
+    });
   }
 };

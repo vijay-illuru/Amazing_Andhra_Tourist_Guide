@@ -22,6 +22,10 @@ const corsOptions = {
 mongoose.set("strictQuery", false);
 const connect = async () => {
   try {
+    if (!process.env.MONGO_URI) {
+      console.error("MONGO_URI is not defined in environment variables");
+      return;
+    }
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -29,7 +33,7 @@ const connect = async () => {
 
     console.log("MongoDB database connected");
   } catch (error) {
-    console.log("MongoDB database connection failed:", error);
+    console.error("MongoDB database connection failed:", error);
   }
 };
 
@@ -37,12 +41,30 @@ const connect = async () => {
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(cookieParser());
+
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
+
+// Routes
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/tours", tourRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/review", reviewRoute);
 app.use("/api/v1/booking", bookingRoute);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error("Error:", err);
+  res.status(500).json({
+    success: false,
+    message: err.message || "Internal server error"
+  });
+});
+
 app.listen(port, () => {
-  connect();
   console.log("Server listening on port", port);
+  connect();
 });

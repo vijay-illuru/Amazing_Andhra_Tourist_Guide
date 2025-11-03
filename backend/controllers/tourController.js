@@ -49,13 +49,20 @@ export const updateTour = async (req, res) => {
       { $set: req.body },
       { new: true }
     );
+    if (!updatedTour) {
+      return res.status(404).json({ success: false, message: "Tour not found" });
+    }
     res.status(200).json({
       success: true,
       message: "Successfully updated",
       data: updatedTour,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to update" });
+    console.error("Error updating tour:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "Failed to update" 
+    });
   }
 };
 
@@ -65,10 +72,17 @@ export const updateTour = async (req, res) => {
 export const deleteTour = async (req, res) => {
   const id = req.params.id;
   try {
-    await Tour.findByIdAndDelete(id);
+    const deletedTour = await Tour.findByIdAndDelete(id);
+    if (!deletedTour) {
+      return res.status(404).json({ success: false, message: "Tour not found" });
+    }
     res.status(200).json({ success: true, message: "Successfully deleted" });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to delete" });
+    console.error("Error deleting tour:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "Failed to delete" 
+    });
   }
 };
 
@@ -79,9 +93,16 @@ export const getSingleTour = async (req, res) => {
   const id = req.params.id;
   try {
     const tour = await Tour.findById(id).populate("reviews");
+    if (!tour) {
+      return res.status(404).json({ success: false, message: "Tour not found" });
+    }
     res.status(200).json({ success: true, data: tour });
   } catch (error) {
-    res.status(404).json({ success: false, message: "Not found" });
+    console.error("Error fetching tour:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "Failed to fetch tour" 
+    });
   }
 };
 
@@ -90,10 +111,35 @@ export const getSingleTour = async (req, res) => {
 // ===========================
 export const getAllTour = async (req, res) => {
   try {
-    const tours = await Tour.find({}).populate("reviews");
-    res.status(200).json({ success: true, count: tours.length, data: tours });
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 0;
+    const limit = 8; // 8 tours per page
+    const skip = page * limit;
+
+    // Get total count for pagination
+    const totalTours = await Tour.countDocuments({});
+    
+    // Get paginated tours
+    const tours = await Tour.find({})
+      .populate("reviews")
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ 
+      success: true, 
+      count: tours.length, 
+      data: tours,
+      page: page,
+      totalPages: Math.ceil(totalTours / limit),
+      totalTours: totalTours
+    });
   } catch (error) {
-    res.status(404).json({ success: false, message: "Not found" });
+    console.error("Error fetching tours:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "Failed to fetch tours" 
+    });
   }
 };
 
@@ -142,6 +188,10 @@ export const getTourCount = async (req, res) => {
     const tourCount = await Tour.estimatedDocumentCount();
     res.status(200).json({ success: true, data: tourCount });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Failed to fetch" });
+    console.error("Error fetching tour count:", err);
+    res.status(500).json({ 
+      success: false, 
+      message: err.message || "Failed to fetch tour count" 
+    });
   }
 };

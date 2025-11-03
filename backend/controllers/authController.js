@@ -68,15 +68,21 @@ export const login = async (req, res) => {
     //create jwt token
     const token = jwt.sign(
       { id: user._id, role: user.role },
-      process.env.JWT_SECERET_KEY,
+      process.env.JWT_SECRET_KEY,
       { expiresIn: "15d" }
     );
 
     // set token in the browser cookies and send the response to the client
+    // Calculate expiration date: 15 days from now
+    const expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + 15);
+    
     res
       .cookie("accessToken", token, {
         httpOnly: true,
-        expires: token.expiresIn,
+        expires: expirationDate,
+        secure: process.env.NODE_ENV === "production", // Secure in production
+        sameSite: "lax",
       })
       .status(200)
       .json({

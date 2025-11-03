@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api/v1/tours';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1/tours';
 
 export const getAllTours = async () => {
   const res = await axios.get(API_URL, { withCredentials: true });

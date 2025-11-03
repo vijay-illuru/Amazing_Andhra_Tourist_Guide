@@ -1,15 +1,61 @@
 .header {
   width: 100%;
   height: 80px;
-  line-height: 80px;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.header .container {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.nav__wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+/* Logo Styles */
+.logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .logo img {
-  width: 15%;
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+/* Navigation Menu */
+.navigation {
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
 .menu {
   margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.nav__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  transition: 0.3s;
 }
 
 .nav__item a {
@@ -17,62 +63,222 @@
   color: var(--heading-color);
   font-weight: 500;
   font-size: 1.1rem;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  position: relative;
 }
 
 .nav__item a:hover {
-  color: inherit;
+  color: var(--secondary-color);
 }
 
 .nav__item a.active__link {
   color: var(--secondary-color);
 }
 
-.mobile__menu {
-  font-size: 1.3 rem;
-  color: var(--heading-color);
-  display: none;
+.nav__item a.active__link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: var(--secondary-color);
+  border-radius: 2px;
 }
 
+/* Nav Right Section */
+.nav__right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+
+.nav__btns {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav__btns h5 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--heading-color);
+  display: flex;
+  align-items: center;
+}
+
+.nav__btns h5 a {
+  text-decoration: none;
+  color: inherit;
+  transition: 0.3s;
+}
+
+.nav__btns h5 a:hover {
+  color: var(--secondary-color);
+}
+
+.nav__btns .btn {
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.nav__btns .btn-dark {
+  background: var(--heading-color) !important;
+  color: #fff !important;
+}
+
+.nav__btns .btn-dark:hover {
+  background: var(--primary-color) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.nav__btns .secondary__btn {
+  background: transparent !important;
+  color: var(--heading-color) !important;
+  border: 2px solid var(--heading-color) !important;
+}
+
+.nav__btns .secondary__btn:hover {
+  background: var(--heading-color) !important;
+  color: #fff !important;
+}
+
+.nav__btns .primary__btn {
+  background: var(--secondary-color) !important;
+  color: #fff !important;
+}
+
+.nav__btns .primary__btn:hover {
+  background: var(--primary-color) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.nav__btns .btn a {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile Menu Icon */
+.mobile__menu {
+  font-size: 1.5rem;
+  color: var(--heading-color);
+  display: none;
+  cursor: pointer;
+  transition: 0.3s;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
+
+.mobile__menu:hover {
+  color: var(--secondary-color);
+  background: rgba(250, 169, 53, 0.1);
+}
+
+/* Sticky Header */
 .sticky__header {
   width: 100%;
   height: 80px;
-  line-height: 80px;
   background: #fff;
   position: sticky;
   top: 0;
   left: 0;
-  box-shadow: 3px 3px 8px -3px #ddd;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   z-index: 999;
+  display: flex;
+  align-items: center;
 }
 
-/* ===== make it responsive =====*/
+/* ===== Responsive Design ===== */
 @media only screen and (max-width: 992px) {
+  .header {
+    padding: 0;
+  }
+
+  .nav__wrapper {
+    gap: 1rem;
+  }
+
   .logo img {
-    width: 20%;
+    width: 100px;
   }
 
   .navigation {
     width: 100%;
-    height: 100%;
+    height: 100vh;
     position: fixed;
     top: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.411);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 999;
     display: none;
+    transition: 0.3s;
   }
 
   .menu {
     position: absolute;
     top: 0;
     right: 0;
-    width: calc(100% - 75%);
-    height: 100%;
+    width: 300px;
+    height: 100vh;
     background: #fff;
     flex-direction: column;
-    line-height: 0.5rem;
-    justify-content: center;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 2rem;
+    gap: 0;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
     z-index: 9999;
+    overflow-y: auto;
+  }
+
+  .menu .nav__item {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+  }
+
+  .menu .nav__item:last-child {
+    border-bottom: none;
+  }
+
+  .menu .nav__item a {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 1rem 1rem;
+    display: block;
+    background-color: transparent;
+  }
+  
+  .menu .nav__item a::after {
+    display: none;
+  }
+  
+  .menu .nav__item a:hover {
+    background-color: transparent;
+  }
+  
+  .menu .nav__item a.active__link {
+    background-color: transparent;
   }
 
   .show__menu {
@@ -82,13 +288,77 @@
   .mobile__menu {
     display: block;
   }
+
+  .nav__btns {
+    gap: 0.75rem;
+  }
+
+  .nav__btns .btn {
+    padding: 0.4rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .nav__btns h5 {
+    font-size: 0.95rem;
+  }
 }
 
 @media only screen and (max-width: 768px) {
-  .logo img {
-    width: 45%;
+  .nav__wrapper {
+    gap: 0.5rem;
   }
+
+  .logo img {
+    width: 90px;
+  }
+
   .menu {
-    width: calc(100% - 50%);
+    width: 280px;
+    padding: 1.5rem;
+  }
+
+  .nav__right {
+    gap: 1rem;
+  }
+
+  .nav__btns {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+  }
+
+  .nav__btns .btn {
+    width: auto;
+    min-width: 80px;
+  }
+
+  .nav__btns h5 {
+    font-size: 0.9rem;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .logo img {
+    width: 80px;
+  }
+
+  .menu {
+    width: 100%;
+    right: 0;
+  }
+
+  .nav__btns {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .nav__btns .btn {
+    padding: 0.35rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .mobile__menu {
+    font-size: 1.3rem;
+    padding: 0.4rem;
   }
 }

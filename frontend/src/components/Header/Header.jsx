@@ -52,6 +52,13 @@ const Header = () => {
   });
 
   const toggleMenu = () => menuRef.current.classList.toggle("show__menu");
+  
+  const closeMenu = () => {
+    if (window.innerWidth <= 992) {
+      menuRef.current.classList.remove("show__menu");
+    }
+  };
+
   return (
     <header className="header" ref={headerRef}>
       <Container>
@@ -59,12 +66,14 @@ const Header = () => {
           <div className="nav__wrapper d-flex align-items-center justify-content-between">
             {/*==================== Logo ====================*/}
             <div className="logo">
-              <img src={logo2} alt="" />
+              <Link to="/home">
+                <img src={logo2} alt="logo" />
+              </Link>
             </div>
             {/*==================== Logo end ====================*/}
 
             {/*==================== menu start ====================*/}
-            <div className="navigation" ref={menuRef} onClick={toggleMenu}>
+            <div className="navigation" ref={menuRef}>
               <ul className="menu d-flex align-items-center gap-5">
                 {nav__links.map((item, index) => (
                   <li className="nav__item" key={index}>
@@ -73,6 +82,7 @@ const Header = () => {
                       className={(navClass) =>
                         navClass.isActive ? "active__link" : ""
                       }
+                      onClick={closeMenu}
                     >
                       {item.display}
                     </NavLink>
@@ -80,12 +90,13 @@ const Header = () => {
                 ))}
                 {/* Admin Dashboard Link */}
                 {user && user.role === "admin" && (
-                  <li className="nav__item me-3">
+                  <li className="nav__item">
                     <NavLink
                       to="/admin"
                       className={(navClass) =>
                         navClass.isActive ? "active__link" : ""
                       }
+                      onClick={closeMenu}
                     >
                       Dashboard
                     </NavLink>
@@ -124,7 +135,7 @@ const Header = () => {
                 )}
               </div>
               <span className="mobile__menu" onClick={toggleMenu}>
-                <i class="ri-menu-line"></i>
+                <i className="ri-menu-line"></i>
               </span>
             </div>
           </div>
